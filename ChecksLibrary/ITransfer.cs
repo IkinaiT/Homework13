@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Homework13
+namespace CheckLibrary
 {
-    internal interface ITransfer<in T>
+    public interface ITransfer<in T>
     {
         void Transfer(T t1, float cash);
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Homework13
+namespace CheckLibrary
 {
-    internal interface IWithdraw<out T>
+    public interface IWithdraw<out T>
         where T : BankCheck
     {
         T Withdraw(float money);

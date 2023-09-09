@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using CheckLibrary;
 
 namespace Homework13
 {
@@ -94,10 +95,17 @@ namespace Homework13
 
             BankChecks = new ObservableCollection<BankCheck>();
             LogList = new ObservableCollection<string>();
+
+            int _checkSum = 0, _bankCheckSum = 0;
+
             for (; i < 10; i++)
             {
                 AddUser();
+                _checkSum += i;
+                _bankCheckSum = _bankCheckSum + BankChecks[i];
             }
+
+            MessageBox.Show($"Проверка результата:\nCRC_CREATE: {_checkSum}\nCRC_CHECKS: {_bankCheckSum}\n{_checkSum.CheckSum(_bankCheckSum)}", "CRC_CHECK");
         }
 
         /// <summary>
@@ -147,15 +155,22 @@ namespace Homework13
                 return transactionCommand ??
                     (transactionCommand = new RelayCommand(obj =>
                     {
-                        ITransfer<BankCheck> t;
-                        ITransfer<Deposite> td = SelectedCheck as Deposite;
-                        ITransfer<NotDeposite> tnd = SelectedCheck as NotDeposite;
-                        if (td != null)
-                            t = td as BankCheck;
-                        else
-                            t = tnd as BankCheck;
+                        try
+                        {
+                            ITransfer<BankCheck> t;
+                            ITransfer<Deposite> td = SelectedCheck as Deposite;
+                            ITransfer<NotDeposite> tnd = SelectedCheck as NotDeposite;
+                            if (td != null)
+                                t = td as BankCheck;
+                            else
+                                t = tnd as BankCheck;
 
-                        t.Transfer(SelectedCheckTransaction as BankCheck, Cash);
+                            t.Transfer(SelectedCheckTransaction as BankCheck, Cash);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Error");
+                        }
 
                     },
                     obj => SelectedCheck != null &&
@@ -176,16 +191,23 @@ namespace Homework13
                 return withdrawChechCommand ??
                     (withdrawChechCommand = new RelayCommand(obj =>
                     {
-                        IWithdraw<Deposite> scd = SelectedCheck as Deposite;
-                        IWithdraw<NotDeposite> scn = SelectedCheck as NotDeposite;
-                        IWithdraw<BankCheck> withdraw;
+                        try
+                        {
+                            IWithdraw<Deposite> scd = SelectedCheck as Deposite;
+                            IWithdraw<NotDeposite> scn = SelectedCheck as NotDeposite;
+                            IWithdraw<BankCheck> withdraw;
 
-                        if (scn != null)
-                            withdraw = scn;
-                        else
-                            withdraw = scd;
+                            if (scn != null)
+                                withdraw = scn;
+                            else
+                                withdraw = scd;
 
-                        withdraw.Withdraw(Cash);
+                            withdraw.Withdraw(Cash);
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Error");
+                        }
                     }));
             }
         }
@@ -246,6 +268,14 @@ namespace Homework13
         private void OnDelete(BankCheck user)
         {
             LogList.Add($"Пользователь {user.UserName} удален");
+        }
+    }
+
+    public static class Extensions
+    {
+        public static string CheckSum(this int sum1,  int sum2)
+        {
+            return sum1 == sum2 ? "Проверка пройдена" : "Ошибка при проверке";
         }
     }
 }

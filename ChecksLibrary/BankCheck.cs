@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Exceptions;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
-namespace Homework13
+namespace CheckLibrary
 {
-    internal class BankCheck : INotifyPropertyChanged, ITransfer<BankCheck>
+    public class BankCheck : INotifyPropertyChanged, ITransfer<BankCheck>
     {
         /// <summary>
         /// Глобальный счетчик ID
@@ -99,9 +94,23 @@ namespace Homework13
         /// <param name="cash">Сумма</param>
         public void Transfer(BankCheck t1, float cash)
         {
-            t1.Cash += cash;
-            this.Cash -= cash;
+            if(this.Cash < cash)
+            {
+                throw new NotEnoughMoneyException($"Недостаточно средств: {cash - this.Cash}");
+            }
+            else
+            {
+
+                t1.Cash += cash;
+                this.Cash -= cash;
+            }
+
             OnTransaction?.Invoke(this, t1, cash);
+        }
+
+        public static int operator +(int _current, BankCheck _check)
+        {
+            return _current + _check.currentID;
         }
     }
 }

@@ -7,4 +7,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ChecksLibrary\ChecksLibrary.csproj" />
+  </ItemGroup>
+
 </Project>
